@@ -1,0 +1,50 @@
+<script>
+    let activeEffect; // global 变量保存当前effect
+
+    class Dep {
+        constructor(val) {
+            this._value = val;
+            // 保存订阅它的函数
+            this.subscribers = new Set();
+        }
+        get value() {
+            this.depend();
+            return this._value;
+        }
+        set value(newValue) {
+            this._value = newValue;
+            this.notify();
+        }
+
+        // 订阅
+        depend() {
+            if (activeEffect) {
+                this.subscribers.add(activeEffect);
+            }
+        }
+
+        // 发生改变后，通知订阅器，执行 effect
+        notify() {
+            this.subscribers.forEach(effect => {
+                effect();
+            });
+        }
+    }
+
+    const msg = new Dep('msg.')
+
+    function watchEffect(effect) {
+        activeEffect = effect;
+        effect();
+        activeEffect = null;
+    }
+
+    // effect run
+    watchEffect(() => {
+        msg.depend();
+        console.log(msg.value);
+    });
+
+
+    msg.value = 'good';
+</script>
