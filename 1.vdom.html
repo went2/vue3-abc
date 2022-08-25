@@ -1,0 +1,103 @@
+<script>
+    function h(tag, props, children) {
+        return {
+            tag, props, children
+        }
+    }
+
+    function mount(vnode, container) {
+        const el = vnode.el = document.createElement(vnode.tag);
+
+        // props
+        if (vnode.props) {
+            for (const key in vnode.props) {
+                if (key.startsWith('on')) {
+                    // 事件监听
+                    el.addEventListener(key.toLowerCase().slice(2), vnode.props[key]);
+                } else {
+                    // 剩下的作为attribute处理
+                    const value = vnode.props[key];
+                    el.setAttribute(key, value);
+                }
+            }
+        }
+
+        //children: string | VNode[]
+        if (vnode.children) {
+            if (typeof vnode.children === 'string') {
+                el.textContent = vnode.children;
+            } else {
+                vnode.children.forEach(child => {
+                    mount(child, el);
+                });
+            }
+        }
+
+        // 挂载到dom节点
+        container.appendChild(el);
+    }
+
+    function patch(n1, n2) {
+        if (n1.tag === n2.tag) {
+            const el = n2.el = n1.el;
+
+            // props
+            const oldProps = n1.props;
+            const newProps = n2.props;
+
+            for (const key in newProps) {
+                // 按照新 vnode 的属性处理一遍
+                const oldValue = oldProps[key];
+                const newValue = newProps[key];
+                if (newValue !== oldValue) el.setAttribute(key, newValue);
+            }
+            for (const key in oldProps) {
+                if (!(key in newProps)) {
+                    el.removeAttribute(key);
+                }
+            }
+
+            // children
+            const oldChildren = n1.children;
+            const newChildren = n2.children;
+            if (typeof newChildren === 'string') {
+                if (typeof oldChildren === 'string') {
+                    if (newChildren !== oldChildren) {
+                        el.textContent = newChildren;
+                    }
+                } else {
+                    el.textContent = newChildren;
+                }
+            } else {
+                if (typeof oldChildren === 'string') {
+                    // 原来是string，现在是vnode[]，先清空，再mount
+                    el.innerHTML = '';
+                    newChildren.forEach(child => {
+                        mount(child, el);
+                    });
+                } else { // 都是vnode[]
+                    // 1.先patch共同的部分
+                    const commonLength = Math.min(oldChildren.length, newChildren.length);
+                    for (let i = 0; i < commonLength; i++) {
+                        patch(oldChildren[i], newChildren[i]);
+                    }
+
+                    // 2.newChildren 更长，得到更长的部分，挂载
+                    if (newChildren.length > oldChildren.length) {
+                        newChildren.slice(oldChildren.length).forEach(child => {
+                            mount(child, el);
+                        });
+                    }
+                    // 3.newChildren 更短，找到少的部分，移除
+                    if (newChildren.length < oldChildren.length) {
+                        oldChildren.slice(newChildren.length).forEach(child => {
+                            el.removeChild(child.el);
+                        });
+                    }
+                }
+            }
+        } else {
+            // replace
+        }
+    }
+</script>

@@ -1,0 +1,93 @@
+<script>
+    let activeEffect; // global 变量保存当前effect
+
+    class Dep {
+        subscribers = new Set();
+
+        depend() {
+            if (activeEffect) {
+                this.subscribers.add(activeEffect);
+            }
+        }
+
+        notify() {
+            this.subscribers.forEach(effect => {
+                effect();
+            });
+        }
+    }
+
+    function watchEffect(effect) {
+        activeEffect = effect;
+        effect();
+        activeEffect = null;
+    }
+
+    // reactive: vue2 的方式
+    // function reactive(raw) {
+    //     Object.keys(raw).forEach(key => {
+    //         const dep = new Dep();
+    //         let value = raw[key];
+
+    //         Object.defineProperty(raw, key, {
+    //             get() {
+    //                 dep.depend();
+    //                 return value;
+    //             },
+    //             set(newValue) {
+    //                 value = newValue;
+    //                 dep.notify();
+    //             },
+    //         });
+    //     });
+
+    //     // 返回一个每个属性都被加上 getter setter 的原对象
+    //     return raw;
+    // }
+
+    // vue3 使用 Proxy 封装响应式对象
+    // 原来的 dependency 实例，现在保存到哪里？存到WeakMap
+
+    // 初始化一个全局WeakMap，用来保存含有dep 实例的 Map对象
+    const targetMap = new WeakMap();
+
+    function getDep(target, key) {
+        let depsMap = targetMap.get(target);
+        if (!depsMap) {
+            depsMap = new Map();
+            targetMap.set(target, depsMap);
+        }
+        let dep = depsMap.get(key);
+        if (!dep) {
+            dep = new Dep();
+            depsMap.set(key, dep);
+        }
+        return dep;
+    }
+
+    const proxyHandler = {
+        get(target, key, receiver) {
+            const dep = getDep(target, key);
+            dep.depend();
+            return Reflect.get(target, key, receiver);
+        },
+        set(target, key, value, receiver) {
+            const dep = getDep(target, key);
+            const result = Reflect.set(target, key, value, receiver);
+            dep.notify();
+            return result;
+        }
+    }
+
+    function reactive(raw) {
+        return new Proxy(raw, proxyHandler);
+    }
+
+    const state = reactive({ count: 0 });
+
+    watchEffect(() => {
+        console.log(state.msg);
+    }); // 输出0
+
+    state.count++; // 输出1
+</script>
