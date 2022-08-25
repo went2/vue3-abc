@@ -1,0 +1,21 @@
+<script>
+
+    function h(tag, props, children) {
+        return {
+            tag, props, children
+        }
+    }
+
+    function mout(vnode, container) {
+        const el = vnode.el = document.createElement(vnode.tag);
+
+        // props
+        if (vnode.props) {
+            for (const key in vnode.props) {
+                const value = vnode.props[key];
+                el.setAttribute(key, value);
+            }
+        }
+    }
+
+</script>
