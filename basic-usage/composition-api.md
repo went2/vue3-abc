@@ -30,3 +30,47 @@ onMounted(() => {
 ref 应用场景：
 1. 其他场景基本都用ref，如定义本地简单数据
 2. 定义从网络中获取的数据
+
+关于ref的其他事：
+
+- 调用 computed(() => {}) 也会返回一个 ref 对象
+
+## 为什么setup() 函数中不能使用this？
+
+因为vue在调用 setup() 时没有把组件实例绑定到setup()中的this，vue 调用setup() 的过程参考下图
+
+![setup-in-source-code](./images/setup-in-source-code.png)
+
+图片来源：codewhy课程：vue3+项目实战 day59-p1049
+
+## 模板中使用 ref 获取元素或组件
+
+声明一个ref对象，将它绑定到元素或组件上。
+
+```vue
+<template>
+<div>
+  <h2 ref="titleRef">我是标题</h2>
+</div>
+</template>
+
+<script>
+  import {ref, onMounted} from 'vue';
+  export default {
+    setup() {
+      const titleRef = ref(null);
+
+      // 函数调用，调用onMounted，为未来的mounted生命周期注册一个回调函数
+      onMounted(() => {
+        console.log(titleRef.value);
+      })
+      return { titleRef }
+    }
+  }
+</script>
+```
+
+## watch() 和 watchEffect()
+
+watch(reactiveObj, ()=>{}): 需要传入侦听源
+watchEffect(): 传入回调函数，会默认执行一次，执行过程中会自动收集依赖哪些响应式数据，依赖数据改变时，就再次执行。watchEffect() 会返回一个 stopWatch handler，调用该函数可停止监听。
