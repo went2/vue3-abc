@@ -55,3 +55,30 @@ function historyChange() {
   }
 }
 ```
+
+## 使用 vue-router
+
+1. 创建路由需要映射的组件；
+2. 通过createRouter 创建路由对象，传入routes和history模式；
+   1. routes数组是路径和组件映射关系的数组；
+   2. 创建基于hash或history模式
+3. 使用app.use注册路由对象
+4. 使用路由：`<router-link>` 创建链接，`<router-view>`为路由的页面占位
+
+## 路由懒加载
+
+```js
+component () => import(/* webpackChunkName:'home-chunk' */'../views/Home.vue');
+```
+
+## 动态路由
+
+```js
+path: '/user/:id'
+```
+
+## NotFound
+
+```js
+path: '/:pathMatch(.*)'
+```
