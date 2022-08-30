@@ -74,3 +74,41 @@ ref 应用场景：
 
 watch(reactiveObj, ()=>{}): 需要传入侦听源
 watchEffect(): 传入回调函数，会默认执行一次，执行过程中会自动收集依赖哪些响应式数据，依赖数据改变时，就再次执行。watchEffect() 会返回一个 stopWatch handler，调用该函数可停止监听。
+
+## 由于 setup() 写的是回调函数，因此可以将逻辑抽离到独立函数中
+
+如，监听界面滚动位置的hook
+
+```js
+import {ref} from 'vue';
+
+export function useScrollPostion() {
+  const scrollX = ref(0);
+  const scrollY = ref(0);
+
+  document.addEventListener('scroll', () => {
+    scrollX.value = window.scrollX;
+    scrollY.value = window.scrollY;
+  });
+
+  return { scrollX, scrollY }
+}
+```
+
+## 减少样板代码的 `<script setup>` 语法糖
+
+- 写在 `<script setup> </script>`中的内容会被编译成setup()函数中的内容；
+- `<script setup>` 中的代码在每次组件实例被创建时都会执行
+- `<script setup>` 和模板处于一个作用域，组件导入即可在模板中使用，无需通过`components()`选项注册
+
+所有编写在顶层中的代码，都默认暴露给template。
+
+- 传入的props通过 `defineProps()` 注册
+- 发出的事件通过 `defineEmits()` 获取
+
+```js
+const emits = defineEmits(["btnClick"])
+emits('btnClick', '传入的参数');
+```
+
+- 使用 `defineExpose` 对父组件暴露子组件的属性和方法，defineExpose({ foo, bar })
