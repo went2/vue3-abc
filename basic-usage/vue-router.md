@@ -71,7 +71,7 @@ function historyChange() {
 component () => import(/* webpackChunkName:'home-chunk' */'../views/Home.vue');
 ```
 
-## 动态路由
+## 动态匹配路由
 
 ```js
 path: '/user/:id'
@@ -81,4 +81,32 @@ path: '/user/:id'
 
 ```js
 path: '/:pathMatch(.*)'
+```
+
+## 动态添加路由
+
+router.addRoute()
+
+使用场景，后台管理系统的动态菜单生成：
+- 动态生成左侧菜单(菜单提供`<router-link>`)
+- 获取到用户详情后，动态添加路由对象
+
+## 路由导航守卫
+
+- 最重要的 beforeEach
+- vue3 不推荐使用next()，代之以返回一个path 或 路由对象
+
+使用场景：
+
+进入某个页面前，进行登陆判断，如果未登录，重定向到登陆页面，如果已登陆则正常进入
+
+```js
+router.beforeEach((to, from) => {
+  const token = localStorage.getItem('token');
+  if(to.path === '/login') return;
+
+  if(to.path === '/order' && !token) {
+    return '/login';
+  }
+});
 ```
