@@ -1,4 +1,4 @@
-# app状态管理——Vuex 和 Pinia
+# app状态管理——Vuex
 
 ## 为什么要有状态管理
 
@@ -16,7 +16,7 @@
 
 此时Vuex中会全是actions
 
-## Vuex
+## 基本概念
 
 单一状态树：整个应用的状态都保存到**一个对象**中。
 
@@ -30,7 +30,7 @@
 2. 通过插件的方式使用store，createApp.use(store)
 3. 在组件中获取store（this.$store.state）
 
-### store的创建
+## store的创建
 
 通过给 createStore() 传配置对象创建一个全局的store
 
@@ -52,7 +52,7 @@ const store = createStore({
 })
 ```
 
-### 在组件中使用store
+## 在组件中使用store
 
 1. mapState(): 从store中获取对应映射，mapState 返回一个对象，对象里面每个属性是函数，{ [key]: Function, [key]: Function }，可以把它直接展开用到computed()中
 
@@ -79,14 +79,14 @@ const {name, id, account} = toRefs(sotre);
 </script>
 ```
 
-### store 的getters
+## getters
 
 - 基本使用（传入 getters 对象，每个 getter 是一个函数）
 - 在getter中使用其他getter，(state, getters) => {}
 - 在getter中返回函数，在使用getter时可以传参
 - getters 可以映射，使用 mapGetters，用法同 mapState
 
-### mutations
+## mutations
 
 修改state必须通过提交mustations，`state.commit('changeName', { name: 'Tommy' })`
 
@@ -104,7 +104,7 @@ createStore({
 
 mutations 可以映射使用，mapMutations()
 
-### actions
+## actions
 
 mutations 中只能做同步操作，异步操作放在actions中进行，并且在actions中的异步操作完成后，需要修改state时，还是要提交mutations进行修改。可以将actions看作是异步修改state的前置操作
 
@@ -154,3 +154,44 @@ function increment() {
     store.dispatch('incrementAction')
 }
 ```
+
+## 分模块保存state
+
+```js
+// src/store/modules/moduleA.js
+const moduleA = {
+    state: () => ({}),
+    mutations: {},
+    actions: {},
+    getters: {},
+}
+
+export default moduleA;
+
+// src/store/modules/moduleB.js
+const moduleB = {
+    state: () => ({}),
+    mutations: {},
+    actions: {},
+}
+
+export default moduleB;
+
+// src/store/index.js
+import moduleA from './modules/moduleA';
+import moduleB from './modules/moduleB';
+
+const store = createStore({
+    modules: {
+        a: moduleA,
+        b: moduleB,
+    },
+});
+
+store.state.a; // 获取moduleA的状态
+store.state.b;
+```
+
+除state以外，模块的其他项如getters, mutations, actions都会合并到一起，在同一个命名空间，所以在取变量名时如果重名会有问题。
+
+所以在设置模块时，传入一个额外属性，`namespace: true`，设置后，相应的key就要加上模块名，如`"moduleA/incrementAction"`
