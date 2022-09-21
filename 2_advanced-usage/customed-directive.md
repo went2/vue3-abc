@@ -47,3 +47,45 @@ app.directives('focus', {
   }
 })
 ```
+
+## 3. 指令的生命周期
+
+指令的生命周期和组件的一样。
+
+```js
+<script setup>
+const vFocus = {
+  created(){},
+  beforeMount(){},
+  mounted(){},
+  beforeUpdate(){},
+  updated(){},
+  beforeUnmount(){},
+  unmounted(){},
+}
+</script>
+```
+
+## 4. 给自定义指令传参数、值、修饰符
+
+给价格加上￥前缀，vue2用filter实现，vue3可用方法、计算属性、自定义指令实现。
+
+```js
+<template>
+  <span v-unit>{{ 12 }} </span>
+</template>
+
+// src/directives/unit.js
+export default function directiveUnit(app) {
+  app.directives('unit', {
+    mounted(el, bindings) {
+      const defaultContent = el.textContent;
+      const unit = bindings.value;
+      if(!unit) {
+        unit = '￥';
+      }
+      el.textContent = unit + defaultContent;
+    }
+  });
+}
+```
