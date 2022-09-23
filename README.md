@@ -1,7 +1,9 @@
 # 说明
 
-vue3 学习拾遗
+vue3 学习拾遗。
 
-`./basic-usage`: api的基本使用
+`./0_core-implement/`: Evan You讲解vue3核心api的实现。
 
-`./core-implement/`: Evan You 对vue3 核心 api 的实现（vuemastery 2020课程）
+`./1_basic-usage`: vue3核心api学习笔记。
+
+`./2_advanced-usage`: vue3进阶api学习笔记。
