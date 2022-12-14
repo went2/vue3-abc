@@ -2,7 +2,7 @@
  * implementation of core renderer logic: VNode to DOM
  * h()
  * mout()
- * pathch()
+ * patch()
  */
 
 function h(type, props, children) {
@@ -41,8 +41,8 @@ function mount(vNode, containerEle) {
 
 /**
  * compare new virtual node with old one and apply rendering
- * @param {*} n1 oldVNode type props children
- * @param {*} n2 newVNode
+ * @param {n1} oldVNode type props children
+ * @param {n2} newVNode
  */
 function patch(n1, n2) { 
   // type 是否相同
@@ -54,6 +54,7 @@ function patch(n1, n2) {
 
   } else {
     const el = n2.el = n1.el;
+
     // diff
     // 1.props
     const oldProps = n1.props || {};
@@ -73,12 +74,11 @@ function patch(n1, n2) {
 
     // remove old props
     for(const key in oldProps) {
+      if(key.startsWith('on')) {
+        el.removeEventListener(key.slice(2).toLowerCase(), oldProps[key]);
+      }
       if(!(key in newProps)) {
-        if(key.startsWith('on')) {
-          el.removeEventListener(key.slice(2).toLowerCase(), oldProps[key]);
-        } else {
-          el.removeAttribute(key);
-        }
+        el.removeAttribute(key);
       }
     }
 

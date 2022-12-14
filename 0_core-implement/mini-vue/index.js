@@ -1,20 +1,21 @@
 const createApp = (rootComponent) => {
   return {
     mount(selector) {
+      const container = document.querySelector(selector);
       let isMounted = false;
-      let preVNode = null;
+      let oldVNode = null;
 
       watchEffect(() => {
         if(!isMounted) {
-          preVNode = rootComponent.render();
-          mount(preVNode, document.querySelector(selector));
+          oldVNode = rootComponent.render();
+          mount(oldVNode, container);
           isMounted = true;
         } else {
           const newNode = rootComponent.render();
-          patch(newNode, preVNode);
-          preVNode = newNode;
+          patch(oldVNode, newNode);
+          oldVNode = newNode;
         }
       });
-    },
+    }
   }
 }

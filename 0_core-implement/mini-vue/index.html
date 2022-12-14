@@ -9,28 +9,25 @@
 <body>
   <div id="app"></div>
   <script src="./renderer.js"></script>
+  <script src="./reactive.js"></script>
+  <script src="./index.js"></script>
   <script>
-    const appVnode = h('div', { id: 'app-container' }, [
-      h('h1', { class: 'title' }, 'This is Title'),
-      h('section', { class: 'section' }, [
-        h('p', null, 'p1p1p1p1p1'),
-        h('p', null, 'p2p2p2p2p2'),
-      ])
-    ]);
-    mount(appVnode, document.querySelector('#app'));
+    // 根组件
+    const App = {
+      data: reactive({ 
+        count: 11
+      }),
+      render() {
+        return h('div', { class: 'app-container' }, [
+          h('h1', null, 'Amazing Counter'),
+          h('p', null, `${ this.data.count }`),
+          h('button', { onClick: () => this.data.count++ }, 'click me +1'),
+        ]);
+      }
+    }
+    const root = createApp(App);
+    root.mount('#app');
 
-    setTimeout(()=> {
-      const newVnode = h('div', { class: 'app-container' },[
-        h('h1', { class: 'title' }, 'Haha, Title has changed'),
-        h('article', { class: 'article-section' }, [
-          h('p', null, 'p1p1p1p1p1'),
-          h('p', null, 'p2p2p2p2p2'),
-          h('p', { style: "border: 1px solid red;"  }, 'I\'m newly added'),
-        ])
-      ]);
-
-      patch(appVnode, newVnode);
-    }, 1000);
   </script>
 </body>
 </html>

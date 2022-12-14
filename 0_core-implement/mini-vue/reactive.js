@@ -30,9 +30,10 @@ class Dep {
   }
 }
 
-let msg1 = new Dep('1111');
 
 let activeEffect;
+
+let msg1 = new Dep('1111');
 
 activeEffect = function () {
   console.log(`rendering ${ msg1.value }.`);
@@ -40,8 +41,7 @@ activeEffect = function () {
 
 activeEffect(); // 手动调用一次以触发依赖收集：打印 rendering 1111
 
-msg1.value = '2222'; // 自动打印 rendering 2222
-msg1.value = '3333'; // 自动打印 rendering 3333，效果实现
+msg1.value = '2222'; // 自动打印 rendering 2222，效果实现
 
 /**
  * 阶段二：定义 watchEffect，只要开发者调用 watchEffect, 就会设置为activeEffect，并调用一次以触发依赖收集
